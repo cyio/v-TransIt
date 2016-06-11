@@ -1,0 +1,53 @@
+{
+  "manifest_version": 2,
+
+  "name": "vTransIt",
+  "description": "让划词翻译更简单",
+  "version": "0.0.1",
+
+  "icons": {
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+
+  "background": {
+    "scripts": [
+      "background.js"
+    ],
+    "persistent": true
+  },
+  
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": [
+        "libs/vue.min.js",
+        "libs/vue-resource.min.js",
+        "content.js"
+      ],
+      "css" : ["content.css"],
+      "all_frames": true
+    }
+  ],
+  
+  "browser_action": {
+    "default_icon": "images/icon48.png",
+    "default_popup": "popup.html"
+  },
+
+  "permissions": [
+    "tabs",
+    "storage",
+    "notifications",
+    "http://fanyi.youdao.com/openapi.do",
+    "http://openapi.baidu.com/",
+    "http://trit.herokuapp.com/api/items",
+    "https://api.shanbay.com/",
+    "https://words-audio.oss.aliyuncs.com/"
+  ],
+  
+  "web_accessible_resources": [
+    "libs/vue.min.js",
+    "libs/vue-resource.min.js"
+    ]
+}
