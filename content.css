@@ -1,4 +1,4 @@
-.v-transit-popover {
+#v-transit-popover {
     position: fixed;
     top: 35px;
     right: 15px;
@@ -16,14 +16,14 @@
     font-size: 14px;
 }
 
-.v-transit-popover .popover-inner {
+#v-transit-popover .popover-inner {
     padding: 1px;
     width: 280px;
     overflow: hidden;
     border-radius: 6px;
 }
 
-.v-transit-popover input {
+#v-transit-popover input {
     color: #209e85;
     font-size: 20px;
     font-weight: normal;
@@ -31,24 +31,24 @@
     width: 100%
 }
 
-.v-transit-popover .popover-title {
+#v-transit-popover .popover-title {
     padding: 9px 15px;
     background-color: #f5f5f5;
     border-bottom: 1px solid #eee;
     border-radius: 3px 3px 0 0;
 }
 
-.v-transit-popover .speak {
+#v-transit-popover .speak {
     cursor: pointer;
     display: inline-block;
     margin-right: 15px;
 }
 
-.v-transit-popover .pronunciation span:first-child {
+#v-transit-popover .pronunciation span:first-child {
     padding-right: 5px;
 }
 
-.v-transit-popover .icon-volume-off {
+#v-transit-popover .icon-volume-off {
     display: inline-block;
     width: 16px;
     height: 16px;
@@ -58,16 +58,32 @@
     background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAABU0lEQVQoU6WSMU7DQBBFGbugDSdAcAG0FjUiErUDEjVQUAckWkQB6SIKuAARBwCJmiQNJdgWCgUUBE6ARUVjmzfWrmSCQ8NKq13/nT9/PPNlZsoyxmyJSJjnecf3/TDLsvMkSVIXLnU8S7rgbWiJw6IoPtg7cRzfKOcX0ZFQ8wjsQ9z0PG+P2H2wBt/bkC+FwBDAWOUGZ5v9CaYKr1EUrekbcUskGIAJ5EUJguCLoFlXMg8pexXsVDEtFcIV2AbnCtAx+8gRn/j5g7J2kTGlvJPw1hJ3ac6DVQq4v3B/LIkE3LmSnLIjKk6Zh6idkLzJ2SX58r+JI+TLUllvNaXe8+7zvwbFZxRHdc3RbjYnmnMNtv6jOXYcwcQ4UjuOsc7RNm0eYt8qL0wzQA+iOAPQyTZ3NcAciVrqnr8s10NpULGczlddU285N46qySmxRYKzqsm/AZFC83O8KzkXAAAAAElFTkSuQmCC") 50% 50% no-repeat;
 }
 
-.v-transit-popover .popover-content {
+#v-transit-popover .popover-content {
     border-radius: 0px 0px 3px 3px;
     padding: 14px !important;
 }
 
-.v-transit-popover .add-btn {
+#v-transit-popover .add-btn {
     margin-top: 10px;
 }
 
-.v-transit-popover .success {
+#v-transit-popover .success {
     color: rgb(41, 192, 169);
     margin-top: 10px;
+}
+.expand-transition {
+  transition: all .3s ease;
+  // padding: 10px;
+  overflow: hidden;
+}
+.expand-enter, .expand-leave {
+  height: 0;
+  padding: 0 5px;
+  opacity: 0;
+}
+.fade-transition {
+  transition: opacity .1s ease;
+}
+.fade-enter, .fade-leave {
+  opacity: 0;
 }

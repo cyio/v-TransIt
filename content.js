@@ -34,7 +34,7 @@ document.body.appendChild(div)
 var vm = new Vue({
   el: '#v-transit',
   template: `
-    <div class="v-transit-popover" v-show="show">
+    <div v-el:app id="v-transit-popover" v-show="show" transition="expand">
         <div class="popover-inner">
             <div class="popover-title">
               <div class="word">
@@ -117,6 +117,13 @@ var vm = new Vue({
       } else {
         this.$els.audious.play()
       }
+    },
+    destroy () {
+      var timeout = 3
+      var that = this
+      setTimeout(function(){
+        that.show = false
+      }, timeout * 1000)
     }
   },
   ready() {
@@ -128,6 +135,11 @@ var vm = new Vue({
         that.word = selection
         that.query(selection, that)
         that.show = true
+      }
+    })
+    this.addListenerMulti(document, 'click', function (e) {
+      if (document.activeElement.tagName === "BODY") {
+        that.destroy()
       }
     })
   }
