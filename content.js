@@ -38,7 +38,7 @@ var vm = new Vue({
         <div class="popover-inner">
             <div class="popover-title">
               <div class="word">
-                <input v-model="word" @keyup.enter="query(word, this)">
+                <input v-model="word" @keyup.enter="search(word, this)">
                 <a href="/bdc/vocabulary/5334" style="float: right;" target="_blank">详细</a>
               </div>
               <div class="pronunciation"> 
@@ -48,13 +48,13 @@ var vm = new Vue({
                 <span>uk:</span>
                 <span class="speaker uk" @click="playAudio('uk')"><i class="icon-volume-off"></i></span> 
               </div>
-              <audio v-el:audiouk preload="auto" v-bind:src="audioUrlUk"></audio>
-              <audio v-el:audious preload="auto" v-bind:src="audioUrlUs"></audio>
+              <audio v-el:audious preload="auto" src=""></audio>
+              <audio v-el:audiouk preload="auto" src=""></audio>
             </div>
             <div class="popover-content">
                 <p>{{ definition }}</p>
-                <div class="add-btn" v-show="isShanbay"><a href="#" class="btn" id="shanbay-add-btn">添加生词</a>
-                    <p class="success hide">成功添加！</p><a href="#" target="_blank" class="btn hide" id="shanbay-check-btn">查看</a></div>
+                <div class="add-btn"><div href="#" class="btn" id="shanbay-add-btn" @click="addWord(id)">添加生词</div>
+                    <p class="success hide"  v-show="isAddSuccess">成功添加！</p><a href="#" target="_blank" class="btn hide" id="shanbay-check-btn">查看</a></div>
             </div>
         </div>
     </div>
@@ -62,10 +62,10 @@ var vm = new Vue({
   data: {
     show: false,
     word: '',
+    id: null,
     definition: '',
     pronunciations: {},
     hasAudio: null,
-    audioUrls: {},
     currentAudioUrl: ''
   },
   computed: {
@@ -96,22 +96,29 @@ var vm = new Vue({
         }
       )
     },
-    query (selection, that) {
+    search (selection, that) {
       that.translate(selection).then(function(result) {
         let data = result.data.data
         that.definition = data.definition
         that.pronunciations = data.pronunciations
         that.hasAudio = data.has_audio
+        that.id = data.id
         if (that.hasAudio) {
           // 0: aliyuncs  1: shanbay cdn
-          that.audioUrls.uk = data.audio_addresses.uk[0]
-          that.audioUrls.us = data.audio_addresses.us[0]
+          that.$els.audiouk.src = data.audio_addresses.uk[0]
+          that.$els.audious.src = data.audio_addresses.us[0]
         }
       })
     },
+    addWord (wordId) {
+      var that = this
+      const url = 'https://api.shanbay.com/bdc/learning/'
+      this.$http({url: url, method: 'PUT', data: wordId}).then(function (response) {
+        console.log(response)
+      }, function (response) {
+      })
+    },
     playAudio (para) {
-      console.log(this.audioUrlUk)
-      console.log(this.audioUrls.uk)
       if (para === 'uk') {
         this.$els.audiouk.play()
       } else {
@@ -119,11 +126,12 @@ var vm = new Vue({
       }
     },
     destroy () {
-      var timeout = 3
+      var time = 3
       var that = this
-      setTimeout(function(){
+      var timeout = setTimeout(function(){
         that.show = false
-      }, timeout * 1000)
+      }, time * 1000)
+      clearTimeout(timeout)
     }
   },
   ready() {
@@ -131,9 +139,10 @@ var vm = new Vue({
     var that = this
     this.addListenerMulti(document, 'mouseup', function (e) {
       const selection = window.getSelection().toString().trim()
+      if (/[\u4e00-\u9fa5]/.test( selection ) || /^[\s.\-0-9()•+]+$/.test( selection )) return
       if (selection) {
         that.word = selection
-        that.query(selection, that)
+        that.search(selection, that)
         that.show = true
       }
     })
