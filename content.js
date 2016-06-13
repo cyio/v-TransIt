@@ -39,10 +39,10 @@ var vm = new Vue({
             <div class="popover-title">
               <div class="word">
                 <input v-model="word" @keyup.enter="search(word, this)">
-                <a href="/bdc/vocabulary/5334" style="float: right;" target="_blank">详细</a>
+                <a href="{{'https://www.shanbay.com/bdc/vocabulary/' + id + '/'}}" style="float: right;" target="_blank">详细</a>
               </div>
               <div class="pronunciation"> 
-                <span>/{{pronunciations.us}}/</span>
+                <span>[ {{pronunciations.us}} ]</span>
                 <span>us:</span>
                 <span class="speaker us" @click="playAudio()"><i class="icon-volume-off"></i></span> 
                 <span>uk:</span>
