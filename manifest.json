@@ -20,6 +20,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
+      "exclude_matches" : ["https://www.shanbay.com/*"],
       "js": [
         "libs/vue.min.js",
         "libs/vue-resource.min.js",
