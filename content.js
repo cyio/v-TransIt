@@ -132,6 +132,9 @@ var vm = new Vue({
         that.show = false
       }, time * 1000)
       clearTimeout(timeout)
+    },
+    canTranslate (text) {
+      return /^[a-z]+(\'|\'s)?$/i.test(text);
     }
   },
   ready() {
@@ -140,7 +143,7 @@ var vm = new Vue({
     this.addListenerMulti(document, 'mouseup', function (e) {
       const selection = window.getSelection().toString().trim()
       if (/[\u4e00-\u9fa5]/.test( selection ) || /^[\s.\-0-9()•+]+$/.test( selection )) return
-      if (selection) {
+      if (selection && that.canTranslate (selection)) {
         that.word = selection
         that.search(selection, that)
         that.show = true
