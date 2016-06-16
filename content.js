@@ -39,9 +39,9 @@ var vm = new Vue({
             <div class="popover-title">
               <div class="word">
                 <input v-model="word" @keyup.enter="search(word, this)">
-                <a href="{{'https://www.shanbay.com/bdc/vocabulary/' + id + '/'}}" style="float: right;" target="_blank">详细</a>
+                <a v-show="hasResult" href="{{'https://www.shanbay.com/bdc/vocabulary/' + id + '/'}}" style="float: right;" target="_blank">详细</a>
               </div>
-              <div class="pronunciation"> 
+              <div class="pronunciation" v-show="hasResult"> 
                 <span>[ {{pronunciations.us}} ]</span>
                 <span>us:</span>
                 <span class="speaker us" @click="playAudio()"><i class="icon-volume-off"></i></span> 
@@ -51,14 +51,15 @@ var vm = new Vue({
               <audio v-el:audious preload="auto" src=""></audio>
               <audio v-el:audiouk preload="auto" src=""></audio>
             </div>
-            <div class="popover-content">
+            <div class="popover-content" v-show="hasResult">
                 <p>{{ definition }}</p>
                 <div class="add-btn"><div href="#" class="btn" id="shanbay-add-btn" @click="addWord(id)">添加生词</div>
                     <p class="success hide"  v-show="isAddSuccess">成功添加！</p><a href="#" target="_blank" class="btn hide" id="shanbay-check-btn">查看</a></div>
             </div>
+            <div class="popover-content msg" v-show="!hasResult">{{notFoundMsg}}</div>
         </div>
     </div>
-    `,
+  `,
   data: {
     show: false,
     word: '',
@@ -66,7 +67,8 @@ var vm = new Vue({
     definition: '',
     pronunciations: {},
     hasAudio: null,
-    currentAudioUrl: ''
+    currentAudioUrl: '',
+    notFoundMsg: ''
   },
   computed: {
     audioUrlUk () {
@@ -74,6 +76,9 @@ var vm = new Vue({
     },
     audioUrlUs () {
       return this.audioUrls.us
+    },
+    hasResult () {
+      return this.notFoundMsg === ''
     }
   },
   methods: {
@@ -86,7 +91,7 @@ var vm = new Vue({
         function(resolve, reject) {
           var url = `https://api.shanbay.com/bdc/search/?word=${word}`
           self.$http.get(url).then(function (response) {            
-            console.log(response)
+            // console.log(response)
             if (response.status === 200) {
               resolve(response)
             } else {
@@ -97,8 +102,13 @@ var vm = new Vue({
       )
     },
     search (selection, that) {
-      that.translate(selection).then(function(result) {
-        let data = result.data.data
+      that.notFoundMsg = ''
+      that.translate(selection).then(function(response) {
+        let data = response.data.data
+        if (response.data.status_code) {
+          that.notFoundMsg = response.data.msg
+          return
+        }
         that.definition = data.definition
         that.pronunciations = data.pronunciations
         that.hasAudio = data.has_audio
@@ -114,7 +124,7 @@ var vm = new Vue({
       var that = this
       const url = 'https://api.shanbay.com/bdc/learning/'
       this.$http({url: url, method: 'PUT', data: wordId}).then(function (response) {
-        console.log(response)
+        // console.log(response)
       }, function (response) {
       })
     },
@@ -138,7 +148,7 @@ var vm = new Vue({
     }
   },
   ready() {
-    console.log('ready')
+    // console.log('ready')
     var that = this
     this.addListenerMulti(document, 'mouseup', function (e) {
       const selection = window.getSelection().toString().trim()
