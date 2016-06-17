@@ -53,8 +53,8 @@ var vm = new Vue({
             </div>
             <div class="popover-content" v-show="hasResult">
                 <p>{{ definition }}</p>
-                <div class="add-btn"><div href="#" class="btn" id="shanbay-add-btn" @click="addWord(id)">添加生词</div>
-                    <p class="success hide"  v-show="isAddSuccess">成功添加！</p><a href="#" target="_blank" class="btn hide" id="shanbay-check-btn">查看</a></div>
+                <div class="add-btn"><div href="#" class="v-transit_btn" id="shanbay-add-btn" @click="addWord(id)">添加生词</div>
+                    <p class="success hide"  v-show="isAddSuccess">成功添加！</p><a href="#" target="_blank" class="v-transit_btn hide" id="shanbay-check-btn">查看</a></div>
             </div>
             <div class="popover-content msg" v-show="!hasResult">{{notFoundMsg}}</div>
         </div>
