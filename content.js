@@ -121,12 +121,9 @@ var vm = new Vue({
       })
     },
     addWord (wordId) {
-      var that = this
-      const url = 'https://api.shanbay.com/bdc/learning/'
-      this.$http({url: url, method: 'PUT', data: wordId}).then(function (response) {
-        // console.log(response)
-      }, function (response) {
-      })
+      // v2 401 (UNAUTHORIZED)
+      // const url = 'https://api.shanbay.com/bdc/learning/'
+      chrome.runtime.sendMessage({method: "addWord", data: wordId})
     },
     playAudio (para) {
       if (para === 'uk') {

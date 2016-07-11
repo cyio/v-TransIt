@@ -11,10 +11,7 @@
   },
 
   "background": {
-    "scripts": [
-      "background.js"
-    ],
-    "persistent": true
+    "scripts":["libs/vue.min.js", "libs/vue-resource.min.js", "background.js"]
   },
   
   "content_scripts": [
@@ -37,9 +34,14 @@
   },
 
   "permissions": [
+    "cookies",
+    "contextMenus",
+    "activeTab",
     "tabs",
     "storage",
     "notifications",
+    "*://*/*",
+    "\u003Call_urls\u003E",
     "http://fanyi.youdao.com/openapi.do",
     "http://openapi.baidu.com/",
     "http://trit.herokuapp.com/api/items",
