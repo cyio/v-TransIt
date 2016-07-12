@@ -30,11 +30,12 @@ vueResourceScript.src = chrome.extension.getURL('libs/vue-resource.min.js');
 const div = document.createElement('div')
 div.innerHTML = '<div id="v-transit"></div>'
 document.body.appendChild(div)
+let timeout
 
 var vm = new Vue({
   el: '#v-transit',
   template: `
-    <div v-el:app id="v-transit-popover" v-show="show" transition="expand">
+    <div v-el:app id="v-transit-popover" v-bind:class="{'fade-in': show, 'fade-out': !show}" transition="expand">
         <div class="popover-inner">
             <div class="popover-title">
               <div class="word">
@@ -68,7 +69,8 @@ var vm = new Vue({
     pronunciations: {},
     hasAudio: null,
     currentAudioUrl: '',
-    notFoundMsg: ''
+    notFoundMsg: '',
+    allowHide: true
   },
   computed: {
     audioUrlUk () {
@@ -132,13 +134,14 @@ var vm = new Vue({
         this.$els.audious.play()
       }
     },
-    destroy () {
+    hide () {
+      if (!this.allowHide) return
+      clearTimeout(timeout)
       var time = 3
       var that = this
-      var timeout = setTimeout(function(){
+      timeout = setTimeout(function(){
         that.show = false
       }, time * 1000)
-      clearTimeout(timeout)
     },
     canTranslate (text) {
       return /^[a-z]+(\'|\'s)?$/i.test(text);
@@ -154,12 +157,16 @@ var vm = new Vue({
         that.word = selection
         that.search(selection, that)
         that.show = true
+        that.hide()
       }
     })
-    this.addListenerMulti(document, 'click', function (e) {
-      if (document.activeElement.tagName === "BODY") {
-        that.destroy()
-      }
+    this.addListenerMulti(this.$els.app, 'mouseover', function (e) {
+      clearTimeout(timeout)
+      that.allowHide = false
+    })
+    this.addListenerMulti(this.$els.app, 'mouseout', function (e) {
+      that.allowHide = true
+      that.hide()
     })
   }
 })

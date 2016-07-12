@@ -14,8 +14,19 @@
     white-space: normal;
     overflow: hidden;
     font-size: 14px;
+    transition: opacity 0.5s ease-in;
 }
 
+#v-transit-popover.fade-out {
+    zoom: 1;
+    filter: alpha(opacity=0);
+    opacity: 0;
+}
+#v-transit-popover.fade-in {
+    zoom: 1;
+    filter: alpha(opacity=100);
+    opacity: 1;
+}
 #v-transit-popover .popover-inner {
     padding: 1px;
     width: 280px;
