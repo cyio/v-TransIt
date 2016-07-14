@@ -53,7 +53,9 @@ var vm = new Vue({
               <audio v-el:audiouk preload="auto" src=""></audio>
             </div>
             <div class="popover-content" v-show="hasResult">
-                <p>{{ definition }}</p>
+                <div class="definition">
+                  <p v-for="item in definition">{{item}}</p>
+                </div>
                 <div class="add-btn"><div href="#" class="v-transit_btn" id="shanbay-add-btn" @click="addWord(id)">添加生词</div>
                     <p class="success hide"  v-show="isAddSuccess">成功添加！</p><a href="#" target="_blank" class="v-transit_btn hide" id="shanbay-check-btn">查看</a></div>
             </div>
@@ -65,7 +67,7 @@ var vm = new Vue({
     show: false,
     word: '',
     id: null,
-    definition: '',
+    definition: [],
     pronunciations: {},
     hasAudio: null,
     currentAudioUrl: '',
@@ -111,7 +113,7 @@ var vm = new Vue({
           that.notFoundMsg = response.data.msg
           return
         }
-        that.definition = data.definition
+        that.definition = data.definition.split('\n')
         that.pronunciations = data.pronunciations
         that.hasAudio = data.has_audio
         that.id = data.id
