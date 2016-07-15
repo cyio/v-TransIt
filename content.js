@@ -1,7 +1,5 @@
 'use strict';
 
-console.log('debug contentscript')
-
 var vueScript = document.createElement('script');
 var vueResourceScript = document.createElement('script');
 // TODO: add "script.js" to web_accessible_resources in manifest.json
@@ -35,7 +33,7 @@ let timeout
 var vm = new Vue({
   el: '#v-transit',
   template: `
-    <div v-el:app id="v-transit-popover" v-bind:class="{'fade-in': show, 'fade-out': !show}" transition="expand">
+    <div v-el:app id="v-transit-popover" v-show="show" transition="expand">
         <div class="popover-inner">
             <div class="popover-title">
               <div class="word">
