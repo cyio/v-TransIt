@@ -11,7 +11,11 @@
   },
 
   "background": {
-    "scripts":["libs/vue.min.js", "libs/vue-resource.min.js", "background.js"]
+    "scripts":["libs/vue.min.js",
+      "libs/vue-resource.min.js",
+      "libs/howler.min.js",
+      "background.js"
+      ]
   },
   
   "content_scripts": [
@@ -51,6 +55,7 @@
   
   "web_accessible_resources": [
     "libs/vue.min.js",
-    "libs/vue-resource.min.js"
+    "libs/vue-resource.min.js",
+    "libs/howler.min.js"
     ]
 }

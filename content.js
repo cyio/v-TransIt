@@ -43,12 +43,10 @@ var vm = new Vue({
               <div class="pronunciation" v-show="hasResult"> 
                 <span>[ {{pronunciations.us}} ]</span>
                 <span>us:</span>
-                <span class="speaker us" @click="playAudio()"><i class="icon-volume-off"></i></span> 
+                <span class="speaker us" @click="play()"><i class="icon-volume-off"></i></span> 
                 <span>uk:</span>
-                <span class="speaker uk" @click="playAudio('uk')"><i class="icon-volume-off"></i></span> 
+                <span class="speaker uk" @click="play('uk')"><i class="icon-volume-off"></i></span> 
               </div>
-              <audio v-el:audious preload="auto" src=""></audio>
-              <audio v-el:audiouk preload="auto" src=""></audio>
             </div>
             <div class="popover-content" v-show="hasResult">
                 <div class="definition">
@@ -68,6 +66,7 @@ var vm = new Vue({
     definition: [],
     pronunciations: {},
     hasAudio: null,
+    audios: {},
     currentAudioUrl: '',
     notFoundMsg: '',
     allowHide: true
@@ -117,8 +116,10 @@ var vm = new Vue({
         that.id = data.id
         if (that.hasAudio) {
           // 0: aliyuncs  1: shanbay cdn
-          that.$els.audiouk.src = data.audio_addresses.uk[0]
-          that.$els.audious.src = data.audio_addresses.us[0]
+          that.audios = {
+            uk: data.audio_addresses.uk[0],
+            us: data.audio_addresses.us[0]
+          }
         }
       })
     },
@@ -127,11 +128,11 @@ var vm = new Vue({
       // const url = 'https://api.shanbay.com/bdc/learning/'
       chrome.runtime.sendMessage({method: "addWord", data: wordId})
     },
-    playAudio (para) {
+    play (para) {
       if (para === 'uk') {
-        this.$els.audiouk.play()
+        chrome.runtime.sendMessage({method: "playAudio", data: this.audios.uk})
       } else {
-        this.$els.audious.play()
+        chrome.runtime.sendMessage({method: "playAudio", data: this.audios.us})
       }
     },
     hide () {

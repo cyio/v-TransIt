@@ -18,6 +18,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         case 'forgetWord':
             forgetWordInBrgd(request.data, sender.tab);
             break;
+        case 'playAudio':
+            playAudio(request.data);
+            break;
         default :
             sendResponse({data: []}); // snub them.
     }
@@ -41,4 +44,12 @@ function addNewWordInBrgd(word_id, tab) {
           console.log('error');
         })
     });
+}
+
+function playAudio(audio_url) {
+    if (audio_url) {
+        new Howl({
+            src: [audio_url]
+        }).play()
+    }
 }
