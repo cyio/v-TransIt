@@ -132,6 +132,14 @@
   appearance: none
 }
 
+.v-transit_btn.disabled {
+  background-image: none;
+  font-weight: normal;
+  background-color: #D2D1D1;
+  cursor: default;
+  color: gray;
+}
+
 .btn i {
   font-style: normal;
   font-weight: 500;

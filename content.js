@@ -52,8 +52,10 @@ var vm = new Vue({
                 <div class="definition">
                   <p v-for="item in definition">{{item}}</p>
                 </div>
-                <div class="add-btn"><div href="#" class="v-transit_btn" id="shanbay-add-btn" @click="addWord(id)">添加生词</div>
-                    <p class="success hide"  v-show="isAddSuccess">成功添加！</p><a href="#" target="_blank" class="v-transit_btn hide" id="shanbay-check-btn">查看</a></div>
+                <div class="add-btn">
+                  <div href="#" class="v-transit_btn" v-show="!isAddSuccess" id="shanbay-add-btn" @click="addWord(id)">添加生词</div>
+                  <div class="v-transit_btn disabled" v-show="isAddSuccess">已加入学习计划</div>
+                </div>
             </div>
             <div class="popover-content msg" v-show="!hasResult">{{notFoundMsg}}</div>
         </div>
@@ -69,7 +71,8 @@ var vm = new Vue({
     audios: {},
     currentAudioUrl: '',
     notFoundMsg: '',
-    allowHide: true
+    allowHide: true,
+    isAddSuccess: false
   },
   computed: {
     audioUrlUk () {
@@ -168,7 +171,40 @@ var vm = new Vue({
     this.addListenerMulti(this.$els.app, 'mouseout', function (e) {
       that.allowHide = true
       that.hide()
-    })
+    })    
+    chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+        console.log("received\n");
+        console.log(message.data);
+        switch (message.callback) {
+            case 'popover':
+                popover(message.data);
+                break;
+            case 'forgetWord':
+                switch (message.data.msg) {
+                    case "success":
+                        $('#shanbay-forget-btn').addClass('hide');
+                        $('#shanbay_popover .success, #shanbay-check-btn').removeClass('hide');
+                        break;
+                    case "error":
+                        $('#shanbay_popover .success').text('添加失败，请重试。').removeClass().addClass('failed');
+                        break;
+                    default:
+                }
+                break;
+            case 'addWord':
+                switch (message.data.msg) {
+                    case "success":
+                        that.isAddSuccess = true
+                        // $('#shanbay-check-btn').attr('href', 'http://www.shanbay.com/review/learning/' + rsp.data.rsp.id);
+                        break;
+                    case "error":
+                        $('#shanbay_popover .success').text('添加失败，请重试。').removeClass().addClass('failed');
+                        break;
+                    default:
+                }
+                break;
+        }
+    });
   }
 })
 

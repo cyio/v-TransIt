@@ -31,6 +31,7 @@ function addNewWordInBrgd(word_id, tab) {
     chrome.cookies.getAll({"url": 'http://www.shanbay.com'}, function (cookies) {
         Vue.http({url: 'http://www.shanbay.com/api/v1/bdc/learning/', method: 'POST', data: JSON.stringify({content_type: "vocabulary", id: word_id}) }).then(function (response) {
           console.log(response)
+          console.log(tab.id)
           chrome.tabs.sendMessage(tab.id, {
               callback: 'addWord',
               data: {msg: 'success', rsp: response.data}
