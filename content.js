@@ -90,10 +90,10 @@ var vm = new Vue({
       s.split().forEach(e => el.addEventListener(e, fn, false));
     },
     translate (word) {
-      let self = this
+      const self = this
       return new Promise(
         function(resolve, reject) {
-          var url = `https://api.shanbay.com/bdc/search/?word=${word}`
+          const url = `https://api.shanbay.com/bdc/search/?word=${word}`
           self.$http.get(url).then(function (response) {            
             // console.log(response)
             if (response.status === 200) {
@@ -104,6 +104,28 @@ var vm = new Vue({
           })
         }
       )
+    },
+    youdao (word) {
+      const API_URL = 'http://fanyi.youdao.com/openapi.do?keyfrom=TransIt&key=597592531&type=data&doctype=json&version=1.1&q='
+      const self = this
+      this.$http.get(API_URL + word).then((response) => {
+        console.log(response)
+        if (response.statusText === 'OK') {
+          const errorCode = response.data.errorCode
+          const data = response.data
+          if (errorCode === 0) {
+            console.log(data.translation[0])
+            // self.definition = data.translation[0]
+            self.definition = data.web[0]
+            self.show = true
+            self.hide()
+          } else if (errorCode === 60) {
+            // 无词典结果，仅在获取词典结果生效
+          } else if (errorCode === 30) {
+            // 无法进行有效的翻译
+          }
+        }
+      })
     },
     search (selection, that) {
       that.notFoundMsg = ''
@@ -149,6 +171,9 @@ var vm = new Vue({
     },
     canTranslate (text) {
       return /^[a-z]+(\'|\'s)?$/i.test(text);
+    },
+    hasChinese (text) {
+      return /[\u4e00-\u9fa5]/.test(text)
     }
   },
   ready() {
@@ -156,12 +181,17 @@ var vm = new Vue({
     var that = this
     this.addListenerMulti(document, 'mouseup', function (e) {
       const selection = window.getSelection().toString().trim()
-      if (/[\u4e00-\u9fa5]/.test( selection ) || /^[\s.\-0-9()•+]+$/.test( selection )) return
-      if (selection && that.canTranslate (selection)) {
-        that.word = selection
-        that.search(selection, that)
-        that.show = true
-        that.hide()
+      if (/^[\s.\-0-9()•+]+$/.test( selection )) return
+      if (selection) {
+        if (that.hasChinese(selection)) {
+          that.word = selection
+          that.youdao(selection)
+        } else if (that.canTranslate (selection)){
+          that.word = selection
+          that.search(selection, that)
+          that.show = true
+          that.hide()
+        }
       }
     })
     this.addListenerMulti(this.$els.app, 'mouseover', function (e) {
