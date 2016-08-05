@@ -2,28 +2,10 @@
 
 var vueScript = document.createElement('script');
 var vueResourceScript = document.createElement('script');
-// TODO: add "script.js" to web_accessible_resources in manifest.json
 vueScript.src = chrome.extension.getURL('libs/vue.min.js');
 vueResourceScript.src = chrome.extension.getURL('libs/vue-resource.min.js');
 (document.head || document.documentElement).appendChild(vueScript);
 (document.head || document.documentElement).appendChild(vueResourceScript);
-// s.onload = function() {
-//     console.log('onload')
-//     // this.parentNode.removeChild(this);
-// };
-// var srcs = [
-//   chrome.extension.getURL('libs/vue.min.js'),
-//   chrome.extension.getURL('libs/vue-resource.min.js')
-// ]
-// function addMultiScripts (urls) {
-//   urls.forEach((url) => {
-//     var script = document.createElement('script')
-//     console.log(script)
-//     (document.head || document.documentElement).appendChild(script)
-//   });
-// }
-
-// addMultiScripts(srcs)
 
 const div = document.createElement('div')
 div.innerHTML = '<div id="v-transit"></div>'
@@ -48,12 +30,12 @@ var vm = new Vue({
                 <span class="speaker uk" @click="play('uk')"><i class="icon-volume-off"></i></span> 
               </div>
             </div>
-            <div class="popover-content" v-show="hasResult">
+            <div class="popover-content" v-show="hasAudio">
                 <div class="definition">
                   <p v-for="item in definition">{{item}}</p>
                 </div>
                 <div class="add-btn">
-                  <div href="#" class="v-transit_btn" v-show="!isAddSuccess" id="shanbay-add-btn" @click="addWord(id)">添加生词</div>
+                  <div href="#" class="v-transit_btn" v-show="!isAddSuccess && !hasChinese" id="shanbay-add-btn" @click="addWord(id)">添加生词</div>
                   <div class="v-transit_btn disabled" v-show="isAddSuccess">已加入学习计划</div>
                 </div>
             </div>
@@ -115,8 +97,8 @@ var vm = new Vue({
           const data = response.data
           if (errorCode === 0) {
             console.log(data.translation[0])
-            // self.definition = data.translation[0]
-            self.definition = data.web[0]
+            self.definition = data.translation
+            //self.definition = data.web
             self.show = true
             self.hide()
           } else if (errorCode === 60) {
@@ -149,8 +131,6 @@ var vm = new Vue({
       })
     },
     addWord (wordId) {
-      // v2 401 (UNAUTHORIZED)
-      // const url = 'https://api.shanbay.com/bdc/learning/'
       chrome.runtime.sendMessage({method: "addWord", data: wordId})
     },
     play (para) {
@@ -194,47 +174,29 @@ var vm = new Vue({
         }
       }
     })
-    this.addListenerMulti(this.$els.app, 'mouseover', function (e) {
+    this.addListenerMulti(this.$els.app, 'mouseover', (e) => {
       clearTimeout(timeout)
       that.allowHide = false
     })
-    this.addListenerMulti(this.$els.app, 'mouseout', function (e) {
+    this.addListenerMulti(this.$els.app, 'mouseout', (e) => {
       that.allowHide = true
       that.hide()
     })    
-    chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-        console.log("received\n");
-        console.log(message.data);
-        switch (message.callback) {
-            case 'popover':
-                popover(message.data);
-                break;
-            case 'forgetWord':
-                switch (message.data.msg) {
-                    case "success":
-                        $('#shanbay-forget-btn').addClass('hide');
-                        $('#shanbay_popover .success, #shanbay-check-btn').removeClass('hide');
-                        break;
-                    case "error":
-                        $('#shanbay_popover .success').text('添加失败，请重试。').removeClass().addClass('failed');
-                        break;
-                    default:
-                }
-                break;
-            case 'addWord':
-                switch (message.data.msg) {
-                    case "success":
-                        that.isAddSuccess = true
-                        // $('#shanbay-check-btn').attr('href', 'http://www.shanbay.com/review/learning/' + rsp.data.rsp.id);
-                        break;
-                    case "error":
-                        $('#shanbay_popover .success').text('添加失败，请重试。').removeClass().addClass('failed');
-                        break;
-                    default:
-                }
-                break;
-        }
-    });
+
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+      console.log("received\n")
+      console.log(message.data)
+      if (message.callback === 'popover') {
+          popover(message.data);
+      } else if (message.callback === 'addWord') {
+        if (message.data.msg === "success") {
+          that.isAddSuccess = true
+        } else (
+          //添加失败
+        )
+      }
+    })
+
   }
 })
 
