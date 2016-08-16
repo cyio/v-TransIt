@@ -191,12 +191,11 @@ var vm = new Vue({
       } else if (message.callback === 'addWord') {
         if (message.data.msg === "success") {
           that.isAddSuccess = true
-        } else (
+        } else {
           //添加失败
-        )
+        }
       }
     })
-
   }
 })
 
