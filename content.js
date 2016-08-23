@@ -19,7 +19,7 @@ var vm = new Vue({
         <div class="popover-inner">
             <div class="popover-title">
               <div class="word">
-                <input v-model="word" @keyup.enter="search(word, this)">
+                <input v-model="word" @keyup.enter="hasChinese ? youdao(word) : shanbay(word)">
                 <a v-show="hasResult" href="{{'https://www.shanbay.com/bdc/vocabulary/' + id + '/'}}" style="float: right;" target="_blank">详细</a>
               </div>
               <div class="pronunciation" v-show="hasResult"> 
@@ -30,13 +30,12 @@ var vm = new Vue({
                 <span class="speaker uk" @click="play('uk')"><i class="icon-volume-off"></i></span> 
               </div>
             </div>
-            <div class="popover-content" v-show="hasAudio">
+            <div class="popover-content" v-show="hasResult">
                 <div class="definition">
                   <p v-for="item in definition">{{item}}</p>
                 </div>
                 <div class="add-btn">
-                  <div href="#" class="v-transit_btn" v-show="!isAddSuccess && !hasChinese" id="shanbay-add-btn" @click="addWord(id)">添加生词</div>
-                  <div class="v-transit_btn disabled" v-show="isAddSuccess">已加入学习计划</div>
+                  <div href="#" class="v-transit_btn" v-bind:class="{'disabled': isAddSuccess}" v-show="showAddBtn" id="shanbay-add-btn" @click="addWord(id)">{{isAddSuccess ? '添加成功' : '添加生词'}}</div>
                 </div>
             </div>
             <div class="popover-content msg" v-show="!hasResult">{{notFoundMsg}}</div>
@@ -54,6 +53,8 @@ var vm = new Vue({
     currentAudioUrl: '',
     notFoundMsg: '',
     allowHide: true,
+		learningId: null,
+		showAddBtn: false,
     isAddSuccess: false
   },
   computed: {
@@ -65,38 +66,30 @@ var vm = new Vue({
     },
     hasResult () {
       return this.notFoundMsg === ''
+		},
+    hasChinese () {
+      return /[\u4e00-\u9fa5]/.test(this.word)
+    },
+    canTranslate () {
+      return /^[a-z]+(\'|\'s)?$/i.test(this.word)
     }
   },
   methods: {
     addListenerMulti (el, s, fn) {
       s.split().forEach(e => el.addEventListener(e, fn, false));
-    },
-    translate (word) {
-      const self = this
-      return new Promise(
-        function(resolve, reject) {
-          const url = `https://api.shanbay.com/bdc/search/?word=${word}`
-          self.$http.get(url).then(function (response) {            
-            // console.log(response)
-            if (response.status === 200) {
-              resolve(response)
-            } else {
-              reject('fail')
-            }
-          })
-        }
-      )
-    },
-    youdao (word) {
-      const API_URL = 'http://fanyi.youdao.com/openapi.do?keyfrom=TransIt&key=597592531&type=data&doctype=json&version=1.1&q='
+		},
+		youdao (word) {
+			this.reset()
+      const API_URL = 'https://fanyi.youdao.com/openapi.do?keyfrom=TransIt&key=597592531&type=data&doctype=json&version=1.1&q='
       const self = this
       this.$http.get(API_URL + word).then((response) => {
-        console.log(response)
+        //console.log(response)
+				//TODO: 修改数据有效检测，可能返回请求频繁提示
         if (response.statusText === 'OK') {
           const errorCode = response.data.errorCode
           const data = response.data
           if (errorCode === 0) {
-            console.log(data.translation[0])
+            //console.log(data.translation[0])
             self.definition = data.translation
             //self.definition = data.web
             self.show = true
@@ -109,27 +102,34 @@ var vm = new Vue({
         }
       })
     },
-    search (selection, that) {
-      that.notFoundMsg = ''
-      that.translate(selection).then(function(response) {
-        let data = response.data.data
-        if (response.data.status_code) {
-          that.notFoundMsg = response.data.msg
-          return
-        }
-        that.definition = data.definition.split('\n')
-        that.pronunciations = data.pronunciations
-        that.hasAudio = data.has_audio
-        that.id = data.id
-        if (that.hasAudio) {
-          // 0: aliyuncs  1: shanbay cdn
-          that.audios = {
-            uk: data.audio_addresses.uk[0],
-            us: data.audio_addresses.us[0]
-          }
-        }
-      })
+    shanbay (selection) {
+			this.reset()
+			chrome.runtime.sendMessage({method: "lookup", data: selection})
     },
+		reset () {
+      this.notFoundMsg = ''
+			this.definition.length = 0
+			this.learningId = null 
+			this.showAddBtn = false
+			this.isAddSuccess = false
+		},
+		handleShanbayData (data) {
+			this.definition = data.definition.split('\n')
+			this.pronunciations = data.pronunciations
+			this.hasAudio = data.has_audio
+			this.id = data.id
+			this.learningId = data.learning_id
+			if (!this.learningId) {
+				this.showAddBtn = true
+			}
+			if (this.hasAudio) {
+				// 0: aliyuncs  1: shanbay cdn
+				this.audios = {
+					uk: data.audio_addresses.uk[0],
+					us: data.audio_addresses.us[0]
+				}
+			}
+		},
     addWord (wordId) {
       chrome.runtime.sendMessage({method: "addWord", data: wordId})
     },
@@ -148,32 +148,25 @@ var vm = new Vue({
       timeout = setTimeout(function(){
         that.show = false
       }, time * 1000)
-    },
-    canTranslate (text) {
-      return /^[a-z]+(\'|\'s)?$/i.test(text);
-    },
-    hasChinese (text) {
-      return /[\u4e00-\u9fa5]/.test(text)
     }
-  },
+},
   ready() {
-    // console.log('ready')
     var that = this
     this.addListenerMulti(document, 'mouseup', function (e) {
       const selection = window.getSelection().toString().trim()
+			if (!selection) return
       if (/^[\s.\-0-9()•+]+$/.test( selection )) return
-      if (selection) {
-        if (that.hasChinese(selection)) {
-          that.word = selection
-          that.youdao(selection)
-        } else if (that.canTranslate (selection)){
-          that.word = selection
-          that.search(selection, that)
-          that.show = true
-          that.hide()
-        }
-      }
-    })
+			that.word = selection
+			if (that.hasChinese) {
+				that.youdao(that.word)
+				that.show = true
+				that.hide()
+			} else if (that.canTranslate){
+				that.shanbay(that.word)
+				that.show = true
+				that.hide()
+			}
+		})
     this.addListenerMulti(this.$els.app, 'mouseover', (e) => {
       clearTimeout(timeout)
       that.allowHide = false
@@ -184,13 +177,22 @@ var vm = new Vue({
     })    
 
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      console.log("received\n")
-      console.log(message.data)
-      if (message.callback === 'popover') {
-          popover(message.data);
+      //console.log(message.data)
+      if (message.callback === 'lookup') {
+				if (message.data.msg === "success") {
+					const data = message.data.rsp.data
+					if (data.status_code) {
+						this.notFoundMsg = data.msg
+					} else {
+						this.handleShanbayData(data)
+					}
+				} else {
+					//失败
+				}
+
       } else if (message.callback === 'addWord') {
         if (message.data.msg === "success") {
-          that.isAddSuccess = true
+          this.isAddSuccess = true
         } else {
           //添加失败
         }

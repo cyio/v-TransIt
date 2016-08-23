@@ -1,16 +1,14 @@
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if(request.method != 'getLocalStorage') {
-        console.log("received method: " + request.method);
-        console.log(request);
+        //console.log("received method: " + request.method);
+        //console.log(request);
     }
     switch (request.method) {
         case 'is_user_signed_on':
             isUserSignedOn();
             break;
-        case 'lookup':
-            isUserSignedOn(function () {
-                getClickHandler(request.data, sender.tab);
-            });
+				case 'lookup':
+				 		lookup(request.data, sender.tab);
             break;
         case 'addWord':
             addNewWordInBrgd(request.data, sender.tab);
@@ -30,8 +28,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 function addNewWordInBrgd(word_id, tab) {
     chrome.cookies.getAll({"url": 'http://www.shanbay.com'}, function (cookies) {
         Vue.http({url: 'http://www.shanbay.com/api/v1/bdc/learning/', method: 'POST', data: JSON.stringify({content_type: "vocabulary", id: word_id}) }).then(function (response) {
-          console.log(response)
-          console.log(tab.id)
+          //console.log(response)
+          //console.log(tab.id)
           chrome.tabs.sendMessage(tab.id, {
               callback: 'addWord',
               data: {msg: 'success', rsp: response.data}
@@ -54,3 +52,23 @@ function playAudio(audio_url) {
         }).play()
     }
 }
+
+function lookup(word, tab) {
+    chrome.cookies.getAll({"url": 'http://www.shanbay.com'}, function (cookies) {
+        Vue.http.get('http://www.shanbay.com/api/v1/bdc/search/?word=' + word).then(function (response) {
+          chrome.tabs.sendMessage(tab.id, {
+              callback: 'lookup',
+              data: {msg: 'success', rsp: response.data}
+          });
+          console.log('success');
+        }, function (response) {
+          chrome.tabs.sendMessage(tab.id, {
+              callback: 'lookup',
+              data: {msg: 'error', rsp: {}}
+          });
+          console.log('error');
+        })
+    });
+}
+
+
