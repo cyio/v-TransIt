@@ -80,7 +80,7 @@ var vm = new Vue({
 		},
 		youdao (word) {
 			this.reset()
-      const API_URL = 'https://fanyi.youdao.com/openapi.do?keyfrom=TransIt&key=597592531&type=data&doctype=json&version=1.1&q='
+      const API_URL = 'https://fanyi.youdao.com/openapi.do?keyfrom=TransIt&key=90781853&type=data&doctype=json&version=1.1&q='
       const self = this
       this.$http.get(API_URL + word).then((response) => {
         //console.log(response)

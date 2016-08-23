@@ -2,7 +2,7 @@
   "manifest_version": 2,
 
   "name": "vTransIt",
-  "description": "让划词翻译更简单",
+  "description": "为Web而生，灵活简单的翻译工具",
   "version": "1.0.0",
 
   "icons": {
