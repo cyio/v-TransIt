@@ -20,9 +20,9 @@ var vm = new Vue({
             <div class="popover-title">
               <div class="word">
                 <input v-model="word" @keyup.enter="hasChinese ? youdao(word) : shanbay(word)">
-                <a v-show="hasResult" href="{{'https://www.shanbay.com/bdc/vocabulary/' + id + '/'}}" style="float: right;" target="_blank">详细</a>
+                <a v-show="hasResult" href="{{detailUrl}}" style="float: right;" target="_blank">详细</a>
               </div>
-              <div class="pronunciation" v-show="hasResult"> 
+              <div class="pronunciation" v-show="hasResult && !hasChinese"> 
                 <span>[ {{pronunciations.us}} ]</span>
                 <span>us:</span>
                 <span class="speaker us" @click="play()"><i class="icon-volume-off"></i></span> 
@@ -72,7 +72,20 @@ var vm = new Vue({
     },
     canTranslate () {
       return /^[a-z]+(\'|\'s)?$/i.test(this.word)
-    }
+		},
+		detailUrl () {
+			let url
+			if (this.hasChinese) {
+				url = 'http://youdao.com/w/eng/' + this.word 	
+			} else {
+				if (this.learningId) {
+					url = 'https://www.shanbay.com/review/learning/' + this.learningId + '/'
+				} else {
+					url = 'https://www.shanbay.com/bdc/vocabulary/' + this.id + '/'
+				}
+			}
+			return url
+		}
   },
   methods: {
     addListenerMulti (el, s, fn) {
@@ -80,10 +93,10 @@ var vm = new Vue({
 		},
 		youdao (word) {
 			this.reset()
-      const API_URL = 'https://fanyi.youdao.com/openapi.do?keyfrom=TransIt&key=90781853&type=data&doctype=json&version=1.1&q='
+      const API_URL = 'https://fanyi.youdao.com/openapi.do?keyfrom=vTransIt&key=90781853&type=data&doctype=json&version=1.1&q='
       const self = this
       this.$http.get(API_URL + word).then((response) => {
-        //console.log(response)
+        console.log(response)
 				//TODO: 修改数据有效检测，可能返回请求频繁提示
         if (response.statusText === 'OK') {
           const errorCode = response.data.errorCode
