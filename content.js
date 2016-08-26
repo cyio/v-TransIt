@@ -20,9 +20,9 @@ var vm = new Vue({
             <div class="popover-title">
               <div class="word">
                 <input v-model="word" @keyup.enter="hasChinese ? youdao(word) : shanbay(word)">
-                <a v-show="hasResult" href="{{detailUrl}}" style="float: right;" target="_blank">详细</a>
+                <a v-show="showResult" href="{{detailUrl}}" style="float: right;" target="_blank">详细</a>
               </div>
-              <div class="pronunciation" v-show="hasResult && !hasChinese"> 
+              <div class="pronunciation" v-show="showResult && !hasChinese"> 
                 <span>[ {{pronunciations.us}} ]</span>
                 <span>us:</span>
                 <span class="speaker us" @click="play()"><i class="icon-volume-off"></i></span> 
@@ -30,7 +30,7 @@ var vm = new Vue({
                 <span class="speaker uk" @click="play('uk')"><i class="icon-volume-off"></i></span> 
               </div>
             </div>
-            <div class="popover-content" v-show="hasResult">
+            <div class="popover-content" v-show="showResult">
                 <div class="definition">
                   <p v-for="item in definition">{{item}}</p>
                 </div>
@@ -38,6 +38,13 @@ var vm = new Vue({
                   <div href="#" class="v-transit_btn" v-bind:class="{'disabled': isAddSuccess}" v-show="showAddBtn" id="shanbay-add-btn" @click="addWord(id)">{{isAddSuccess ? '添加成功' : '添加生词'}}</div>
                 </div>
             </div>
+						<div class="loading_dots" v-show="!showResult">
+							<span></span>
+							<span></span>
+							<span></span>
+							<span></span>
+							<span></span>
+						</div>
             <div class="popover-content msg" v-show="!hasResult">{{notFoundMsg}}</div>
         </div>
     </div>
@@ -52,10 +59,11 @@ var vm = new Vue({
     audios: {},
     currentAudioUrl: '',
     notFoundMsg: '',
-    allowHide: true,
+    canHide: true,
 		learningId: null,
 		showAddBtn: false,
-    isAddSuccess: false
+		isAddSuccess: false,
+		showResult: false
   },
   computed: {
     audioUrlUk () {
@@ -105,7 +113,7 @@ var vm = new Vue({
             //console.log(data.translation[0])
             self.definition = data.translation
             //self.definition = data.web
-            self.show = true
+						self.showResult = true
             self.hide()
           } else if (errorCode === 60) {
             // 无词典结果，仅在获取词典结果生效
@@ -121,6 +129,7 @@ var vm = new Vue({
     },
 		reset () {
       this.notFoundMsg = ''
+			this.showResult = false
 			this.definition.length = 0
 			this.learningId = null 
 			this.showAddBtn = false
@@ -142,6 +151,7 @@ var vm = new Vue({
 					us: data.audio_addresses.us[0]
 				}
 			}
+			this.showResult = true
 		},
     addWord (wordId) {
       chrome.runtime.sendMessage({method: "addWord", data: wordId})
@@ -154,7 +164,7 @@ var vm = new Vue({
       }
     },
     hide () {
-      if (!this.allowHide) return
+      if (!this.canHide) return
       clearTimeout(timeout)
       var time = 3
       var that = this
@@ -164,7 +174,14 @@ var vm = new Vue({
     }
 },
   ready() {
-    var that = this
+		this.$watch('word', function () {
+			Vue.nextTick(function () {
+				if (!this.canHide) {
+					this.showResult = false
+				}
+			}.bind(this))
+		})
+		var that = this
     this.addListenerMulti(document, 'mouseup', function (e) {
       const selection = window.getSelection().toString().trim()
 			if (!selection) return
@@ -182,10 +199,10 @@ var vm = new Vue({
 		})
     this.addListenerMulti(this.$els.app, 'mouseover', (e) => {
       clearTimeout(timeout)
-      that.allowHide = false
+      that.canHide = false
     })
     this.addListenerMulti(this.$els.app, 'mouseout', (e) => {
-      that.allowHide = true
+      that.canHide = true
       that.hide()
     })    
 
