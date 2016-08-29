@@ -104,7 +104,8 @@ var vm = new Vue({
       const API_URL = 'https://fanyi.youdao.com/openapi.do?keyfrom=vTransIt&key=90781853&type=data&doctype=json&version=1.1&q='
       const self = this
       this.$http.get(API_URL + word).then((response) => {
-        console.log(response)
+				self.hide()
+        //console.log(response)
 				//TODO: 修改数据有效检测，可能返回请求频繁提示
         if (response.statusText === 'OK') {
           const errorCode = response.data.errorCode
@@ -190,11 +191,9 @@ var vm = new Vue({
 			if (that.hasChinese) {
 				that.youdao(that.word)
 				that.show = true
-				that.hide()
 			} else if (that.canTranslate){
 				that.shanbay(that.word)
 				that.show = true
-				that.hide()
 			}
 		})
     this.addListenerMulti(this.$els.app, 'mouseover', (e) => {
@@ -209,6 +208,7 @@ var vm = new Vue({
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       //console.log(message.data)
       if (message.callback === 'lookup') {
+				this.hide()
 				if (message.data.msg === "success") {
 					const data = message.data.rsp.data
 					if (data.status_code) {
