@@ -15,6 +15,11 @@
   overflow: hidden;
   font-size: 14px;
   transition: opacity 0.5s ease-in;
+	color: #404040;
+}
+
+#v-transit-popover a {
+	color: #4078c0	
 }
 
 #v-transit-popover.fade-out {
