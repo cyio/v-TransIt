@@ -63,7 +63,8 @@ var vm = new Vue({
 		learningId: null,
 		showAddBtn: false,
 		isAddSuccess: false,
-		showResult: false
+		showResult: false,
+		cnToEn: false
   },
   computed: {
     audioUrlUk () {
@@ -188,6 +189,7 @@ var vm = new Vue({
 			if (!selection) return
       if (/^[\s.\-0-9()•+]+$/.test( selection )) return
 			that.word = selection
+			if (that.hasChinese && !that.cnToEn) return
 			if (that.hasChinese) {
 				that.youdao(that.word)
 				that.show = true
@@ -204,6 +206,10 @@ var vm = new Vue({
       that.canHide = true
       that.hide()
     })    
+
+		chrome.storage.onChanged.addListener(function(changes, namespace) {
+			that.cnToEn = changes.cnToEn.newValue
+		})
 
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       //console.log(message.data)
