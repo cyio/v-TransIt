@@ -92,13 +92,13 @@
 
 .expand-transition {
   transition: all .3s ease;
-  // padding: 10px;
+  /*padding: 10px;*/
   overflow: hidden;
 }
 
 .expand-enter,
 .expand-leave {
-  // width: 0;
+  /*width: 0;*/
   padding: 0 5px;
   opacity: 0;
 }
@@ -143,69 +143,6 @@
   background-color: #D2D1D1;
   cursor: default;
   color: gray;
-}
-
-.btn i {
-  font-style: normal;
-  font-weight: 500;
-  opacity: 0.6
-}
-
-.btn .octicon {
-  vertical-align: text-top
-}
-
-.btn .counter {
-  text-shadow: none;
-  background-color: #e5e5e5
-}
-
-.btn:focus {
-  text-decoration: none;
-  border-color: #51a7e8;
-  outline: none;
-  box-shadow: 0 0 5px rgba(81, 167, 232, 0.5)
-}
-
-.btn:focus:hover,
-.btn.selected:focus {
-  border-color: #51a7e8
-}
-
-.btn:hover,
-.btn:active,
-.btn.zeroclipboard-is-hover,
-.btn.zeroclipboard-is-active {
-  text-decoration: none;
-  background-color: #ddd;
-  background-image: -webkit-linear-gradient(#eee, #ddd);
-  background-image: linear-gradient(#eee, #ddd);
-  border-color: #ccc
-}
-
-.btn:active,
-.btn.selected,
-.btn.zeroclipboard-is-active {
-  background-color: #dcdcdc;
-  background-image: none;
-  border-color: #b5b5b5;
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15)
-}
-
-.btn.selected:hover {
-  background-color: #cfcfcf
-}
-
-.btn:disabled,
-.btn:disabled:hover,
-.btn.disabled,
-.btn.disabled:hover {
-  color: rgba(102, 102, 102, 0.5);
-  cursor: default;
-  background-color: rgba(229, 229, 229, 0.5);
-  background-image: none;
-  border-color: rgba(197, 197, 197, 0.5);
-  box-shadow: none
 }
 
 .popover-content p {
