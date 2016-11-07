@@ -3,7 +3,7 @@
 
   "name": "vTransIt",
   "description": "为Web而生，灵活简单的翻译工具",
-  "version": "1.0.3",
+  "version": "1.1.3",
 
   "icons": {
     "48": "images/icon48.png",

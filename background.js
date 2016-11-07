@@ -5,7 +5,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     }
     switch (request.method) {
         case 'is_user_signed_on':
-            isUserSignedOn();
+            isUserSignedOn(sender.tab);
             break;
 				case 'lookup':
 				 		lookup(request.data, sender.tab);
@@ -68,6 +68,24 @@ function lookup(word, tab) {
           });
           console.log('error');
         })
+    });
+}
+
+function isUserSignedOn(tab) {
+    chrome.cookies.get({"url": 'http://www.shanbay.com', "name": 'userid'}, function (cookie) {
+			  var isLogined
+        if (cookie) {
+            localStorage.setItem('shanbay_cookies', cookie);
+						isLogined = true
+        } else {
+            localStorage.removeItem('shanbay_cookies');
+						isLogined = false
+						chrome.tabs.create({url: "https://www.shanbay.com/accounts/login/"})
+        }
+				chrome.tabs.sendMessage(tab.id, {
+						callback: 'loginDetect',
+						data: isLogined 
+				});
     });
 }
 

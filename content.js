@@ -1,18 +1,21 @@
 'use strict';
-
-var vueScript = document.createElement('script');
-var vueResourceScript = document.createElement('script');
+// inject scripts
+const vueScript = document.createElement('script'),
+			vueResourceScript = document.createElement('script');
 vueScript.src = chrome.extension.getURL('libs/vue.min.js');
 vueResourceScript.src = chrome.extension.getURL('libs/vue-resource.min.js');
 (document.head || document.documentElement).appendChild(vueScript);
 (document.head || document.documentElement).appendChild(vueResourceScript);
-
+// inject dom
 const div = document.createElement('div')
 div.innerHTML = '<div id="v-transit"></div>'
 document.body.appendChild(div)
 let timeout
+// login detect
+const loginDetected = localStorage.getItem('shanbay_islogined')
+chrome.runtime.sendMessage({method: "is_user_signed_on"})
 
-var vm = new Vue({
+const vm = new Vue({
   el: '#v-transit',
   template: `
     <div v-el:app id="v-transit-popover" v-show="show" transition="expand">
@@ -35,7 +38,7 @@ var vm = new Vue({
                   <p v-for="item in definition">{{item}}</p>
                 </div>
                 <div class="add-btn">
-                  <div href="#" class="v-transit_btn" v-bind:class="{'disabled': isAddSuccess}" v-show="showAddBtn" id="shanbay-add-btn" @click="addWord(id)">{{isAddSuccess ? '添加成功' : '添加生词'}}</div>
+                  <div href="#" class="v-transit_btn" v-bind:class="{'disabled': isAddSuccess}" v-show="showAddBtn && isUserLogin" id="shanbay-add-btn" @click="addWord(id)">{{isAddSuccess ? '添加成功' : '添加生词'}}</div>
                 </div>
             </div>
 						<div class="loading_dots" v-show="!showResult">
@@ -50,21 +53,24 @@ var vm = new Vue({
     </div>
   `,
   data: {
-    show: false,
-    word: '',
+		// word data
     id: null,
+		learningId: null,
+    word: '',
     definition: [],
     pronunciations: {},
     hasAudio: null,
     audios: {},
     currentAudioUrl: '',
     notFoundMsg: '',
+		// status
     canHide: true,
-		learningId: null,
+    show: false,
+		showResult: false,
 		showAddBtn: false,
 		isAddSuccess: false,
-		showResult: false,
-		cnToEn: false
+		cnToEn: false,
+		isUserLogin: false
   },
   computed: {
     audioUrlUk () {
@@ -232,7 +238,12 @@ var vm = new Vue({
         } else {
           //添加失败
         }
-      }
+			} else if (message.callback === 'loginDetect') {
+				this.isUserLogin = message.data
+        localStorage.setItem('shanbay_islogined', this.isUserLogin)
+				if (!this.isUserLogin) {
+				}
+			}
     })
   }
 })
