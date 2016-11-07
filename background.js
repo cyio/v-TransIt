@@ -80,7 +80,7 @@ function isUserSignedOn(tab) {
         } else {
             localStorage.removeItem('shanbay_cookies');
 						isLogined = false
-						chrome.tabs.create({url: "https://www.shanbay.com/accounts/login/"})
+						//chrome.tabs.create({url: "https://www.shanbay.com/accounts/login/"})
         }
 				chrome.tabs.sendMessage(tab.id, {
 						callback: 'loginDetect',

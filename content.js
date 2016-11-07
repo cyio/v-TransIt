@@ -42,11 +42,7 @@ const vm = new Vue({
                 </div>
             </div>
 						<div class="loading_dots" v-show="!showResult">
-							<span></span>
-							<span></span>
-							<span></span>
-							<span></span>
-							<span></span>
+							<small>{{loadingText}}</small>
 						</div>
             <div class="popover-content msg" v-show="!hasResult">{{notFoundMsg}}</div>
         </div>
@@ -67,6 +63,7 @@ const vm = new Vue({
     canHide: true,
     show: false,
 		showResult: false,
+		loadingText: '查询中',
 		showAddBtn: false,
 		isAddSuccess: false,
 		cnToEn: false,
@@ -125,8 +122,10 @@ const vm = new Vue({
             self.hide()
           } else if (errorCode === 60) {
             // 无词典结果，仅在获取词典结果生效
+						self.loadingText = '无结果'
           } else if (errorCode === 30) {
             // 无法进行有效的翻译
+						self.loadingText = '无法进行有效查询'
           }
         }
       })
@@ -142,8 +141,10 @@ const vm = new Vue({
 			this.learningId = null 
 			this.showAddBtn = false
 			this.isAddSuccess = false
+			this.loadingText = '查询中'
 		},
 		handleShanbayData (data) {
+			if (!(data && data.definition)) return
 			this.definition = data.definition.split('\n')
 			this.pronunciations = data.pronunciations
 			this.hasAudio = data.has_audio
@@ -179,13 +180,20 @@ const vm = new Vue({
       timeout = setTimeout(function(){
         that.show = false
       }, time * 1000)
-    }
+		},
+		isEmptyObject (e) {
+			var t;  
+			for (t in e)  
+				return !1;  
+			return !0  
+		}
 },
   ready() {
 		this.$watch('word', function () {
 			Vue.nextTick(function () {
 				if (!this.canHide) {
 					this.showResult = false
+					this.loadingText = '待命中'
 				}
 			}.bind(this))
 		})
@@ -218,18 +226,20 @@ const vm = new Vue({
 		})
 
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      //console.log(message.data)
       if (message.callback === 'lookup') {
 				this.hide()
-				if (message.data.msg === "success") {
+				if (message.data && message.data.msg === "success") {
 					const data = message.data.rsp.data
-					if (data.status_code) {
+					if (this.isEmptyObject(data)) {
+						this.loadingText = '未找到'
+						return
+					}
+					if (data && data.status_code) {
 						this.notFoundMsg = data.msg
 					} else {
 						this.handleShanbayData(data)
 					}
 				} else {
-					//失败
 				}
 
       } else if (message.callback === 'addWord') {
