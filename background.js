@@ -5,7 +5,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     }
     switch (request.method) {
         case 'is_user_signed_on':
-            isUserSignedOn(sender.tab);
+						isUserSignedOn(function tmp(){}, sender.tab)
             break;
 				case 'lookup':
 				 		lookup(request.data, sender.tab);
@@ -28,8 +28,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 function addNewWordInBrgd(word_id, tab) {
     chrome.cookies.getAll({"url": 'http://www.shanbay.com'}, function (cookies) {
         Vue.http({url: 'http://www.shanbay.com/api/v1/bdc/learning/', method: 'POST', data: JSON.stringify({content_type: "vocabulary", id: word_id}) }).then(function (response) {
-          //console.log(response)
-          //console.log(tab.id)
           chrome.tabs.sendMessage(tab.id, {
               callback: 'addWord',
               data: {msg: 'success', rsp: response.data}
@@ -71,8 +69,8 @@ function lookup(word, tab) {
     });
 }
 
-function isUserSignedOn(tab) {
-    chrome.cookies.get({"url": 'http://www.shanbay.com', "name": 'userid'}, function (cookie) {
+function isUserSignedOn(callback, tab) {
+    return chrome.cookies.get({"url": 'http://www.shanbay.com', "name": 'userid'}, function (cookie) {
 			  var isLogined
         if (cookie) {
             localStorage.setItem('shanbay_cookies', cookie);
@@ -80,13 +78,20 @@ function isUserSignedOn(tab) {
         } else {
             localStorage.removeItem('shanbay_cookies');
 						isLogined = false
-						//chrome.tabs.create({url: "https://www.shanbay.com/accounts/login/"})
+						if (typeof callback === 'function') {
+							callback()
+						}
         }
 				chrome.tabs.sendMessage(tab.id, {
-						callback: 'loginDetect',
-						data: isLogined 
+					callback: 'loginDetect',
+					data: isLogined 
 				});
+				return isLogined
     });
 }
 
+function openLoginPage() {
+	chrome.tabs.create({url: "https://www.shanbay.com/accounts/login/"})
+}
 
+isUserSignedOn(openLoginPage)
