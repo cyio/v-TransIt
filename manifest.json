@@ -3,7 +3,7 @@
 
   "name": "vTransIt",
   "description": "为Web而生，灵活简单的翻译工具",
-  "version": "1.2.5",
+  "version": "1.3.0",
 
   "icons": {
     "48": "images/icon48.png",
@@ -11,8 +11,10 @@
   },
 
   "background": {
-    "scripts":["libs/vue.min.js",
+    "scripts":[
+      "libs/vue.min.js",
       "libs/vue-resource.min.js",
+      "libs/howler.min.js",
       "background.js"
       ]
   },
@@ -51,6 +53,7 @@
   
   "web_accessible_resources": [
     "libs/vue.min.js",
+    "libs/vue-resource.min.js",
     "libs/howler.min.js"
     ]
 }

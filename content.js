@@ -22,7 +22,7 @@ chrome.runtime.sendMessage({method: "is_user_signed_on"})
 const vm = new Vue({
   el: '#v-transit',
   template: `
-    <div v-el:app id="v-transit-popover" v-show="show" transition="expand">
+    <div v-el:app id="v-transit-popover" v-show="show">
         <div class="popover-inner">
             <div class="popover-title">
               <div class="word">
@@ -49,6 +49,7 @@ const vm = new Vue({
 							<small>{{loadingText}}</small>
 						</div>
             <div class="popover-content msg" v-show="!hasResult">{{notFoundMsg}}</div>
+						<div class="close-btn" @click="close">&#215;</div>
         </div>
     </div>
   `,
@@ -186,6 +187,9 @@ const vm = new Vue({
       timeout = setTimeout(function(){
         that.show = false
       }, time * 1000)
+		},
+		close () {
+			this.show = false
 		},
 		isEmptyObject (e) {
 			var t;  
