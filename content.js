@@ -1,11 +1,15 @@
 'use strict';
 // inject scripts
-const vueScript = document.createElement('script'),
-			vueResourceScript = document.createElement('script');
-vueScript.src = chrome.extension.getURL('libs/vue.min.js');
-vueResourceScript.src = chrome.extension.getURL('libs/vue-resource.min.js');
-(document.head || document.documentElement).appendChild(vueScript);
-(document.head || document.documentElement).appendChild(vueResourceScript);
+appendScripts(['libs/vue.min.js'])
+
+function appendScripts (urls) {
+  urls.forEach((url) => {
+    const script = document.createElement('script')
+    script.src = chrome.extension.getURL(url); // 这里分号不可省略，因为下一行是括号开头
+    (document.head || document.documentElement).appendChild(script)
+  })
+}
+
 // inject dom
 const div = document.createElement('div')
 div.innerHTML = '<div id="v-transit"></div>'
@@ -107,7 +111,9 @@ const vm = new Vue({
 			this.reset()
       const API_URL = 'https://fanyi.youdao.com/openapi.do?keyfrom=vTransIt&key=90781853&type=data&doctype=json&version=1.1&q='
       const self = this
-      this.$http.get(API_URL + word).then((response) => {
+      fetch(API_URL + word).then((response) => {
+        console.log(response.json())
+        return
 				self.hide()
         //console.log(response)
 				//TODO: 修改数据有效检测，可能返回请求频繁提示

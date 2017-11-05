@@ -20,10 +20,11 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "exclude_matches" : ["https://www.shanbay.com/*", "https://app.yinxiang.com/*", "https://app.evernote.com/*"],
+      "exclude_matches" : [
+        "https://www.shanbay.com/*"
+      ],
       "js": [
         "libs/vue.min.js",
-        "libs/vue-resource.min.js",
         "content.js"
       ],
       "css" : ["content.css"],
@@ -38,21 +39,18 @@
 
   "permissions": [
     "cookies",
-    "contextMenus",
     "activeTab",
     "tabs",
     "storage",
     "notifications",
-    "*://*/*",
     "http://fanyi.youdao.com/openapi.do",
-    "http://openapi.baidu.com/",
-    "http://trit.herokuapp.com/api/items",
     "https://api.shanbay.com/",
+    "http://www.shanbay.com/",
     "https://words-audio.oss.aliyuncs.com/"
   ],
   
   "web_accessible_resources": [
     "libs/vue.min.js",
-    "libs/vue-resource.min.js"
+    "libs/howler.min.js"
     ]
 }
