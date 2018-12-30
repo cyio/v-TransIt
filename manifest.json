@@ -26,7 +26,7 @@
         "https://www.shanbay.com/*"
       ],
       "js": [
-        "libs/vue.min.js",
+        "util.js",
         "content.js"
       ],
       "css" : ["content.css"],
