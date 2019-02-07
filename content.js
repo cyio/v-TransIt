@@ -4,8 +4,16 @@
 const div = document.createElement('div')
 div.setAttribute('id', 'v-transit-popover');
 // login detect
-const loginDetected = localStorage.getItem('shanbay_islogined')
-chrome.runtime.sendMessage({method: "is_user_signed_on"})
+let shanbayIslogined = localStorage.getItem('shanbay_islogined')
+if (!shanbayIslogined) {
+  chrome.runtime.sendMessage({method: "is_user_signed_on"})
+}
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.callback === 'loginDetect') {
+    localStorage.setItem('shanbay_islogined', message.data)
+    shanbayIslogined = message.data
+  }
+})
 const eleId = '#v-transit-popover'
 let timeout
 
@@ -42,7 +50,7 @@ function initVue({eleId, selection}){
       showAddBtn: false,
       isAddSuccess: false,
       cnToEn: false,
-      isUserLogin: false
+      isUserLogin: shanbayIslogined,
     },
     computed: {
       audioUrlUk () {
