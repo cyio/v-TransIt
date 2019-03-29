@@ -3,7 +3,7 @@ vtTpl = `
   <div class="popover-inner">
     <div class="popover-title">
       <div class="word">
-        <input v-model="word" @keyup.enter="hasChinese ? youdao(word) : shanbay(word)">
+        <input class="word_input" v-model="word" @keyup.enter="hasChinese ? youdao(word) : shanbay(word)">
         <a v-show="showResult" href="{{detailUrl}}" style="float: right;" target="_blank">详细</a>
       </div>
       <div class="pronunciation" v-show="showResult && !hasChinese"> 
@@ -19,7 +19,7 @@ vtTpl = `
         <p v-for="item in definition">{{item}}</p>
       </div>
       <div class="add-btn">
-        <div href="#" class="v-transit_btn" v-bind:class="{'disabled': isAddSuccess}" v-show="showAddBtn && isUserLogin" id="shanbay-add-btn" @click="addWord(id)">{{isAddSuccess ? '添加成功' : '添加生词'}}</div>
+        <div class="v-transit_btn" v-bind:class="{'disabled': isAddSuccess}" v-show="showAddBtn && isUserLogin" id="shanbay-add-btn" @click="addWord(id)">{{isAddSuccess ? '添加成功' : '添加生词'}}</div>
       </div>
     </div>
     <div class="loading_dots" v-show="!showResult">

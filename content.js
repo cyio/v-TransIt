@@ -18,6 +18,11 @@ const eleId = '#v-transit-popover'
 let timeout
 
 document.addEventListener('mouseup', function (e) {
+  const elemWhiteList = [
+    'word_input',
+    'v-transit_btn',
+  ]
+  if (elemWhiteList.some(i => e.target.className.includes(i))) return
   const selection = window.getSelection().toString().trim()
   if (!selection) return
   if (/^[\s.\-0-9()•+]+$/.test( selection )) return
@@ -25,7 +30,7 @@ document.addEventListener('mouseup', function (e) {
     document.body.appendChild(div)
   }
   initVue({eleId, selection})
-})
+}, false)
 
 function initVue({eleId, selection}){
   return new Vue({
@@ -42,7 +47,6 @@ function initVue({eleId, selection}){
       audios: {},
       currentAudioUrl: '',
       notFoundMsg: '',
-      // status
       canHide: true,
       show: false,
       showResult: false,
@@ -159,14 +163,14 @@ function initVue({eleId, selection}){
         var time = 3
         var that = this
         timeout = setTimeout(() => {
-          this.show = false
-          if ($(eleId)) {
-            document.body.removeChild($(eleId))
-          }
+          this.close()
         }, time * 1000)
       },
       close () {
         this.show = false
+        if ($(eleId)) {
+          document.body.removeChild($(eleId))
+        }
       },
       isEmptyObject (e) {
         var t;  
@@ -196,11 +200,11 @@ function initVue({eleId, selection}){
         that.show = true
       }
 
-      addListenerMulti(this.$els.app, 'mouseover', (e) => {
+      addListenerMulti(this.$els.app, 'mouseenter', (e) => {
         clearTimeout(timeout)
         that.canHide = false
       })
-      addListenerMulti(this.$els.app, 'mouseout', (e) => {
+      addListenerMulti(this.$els.app, 'mouseleave', (e) => {
         that.canHide = true
         that.hide()
       })    
