@@ -4,7 +4,7 @@ vtTpl = `
     <div class="popover-title">
       <div class="word">
         <input class="word_input" v-model="word" @keyup.enter="hasChinese ? youdao(word) : shanbay(word)">
-        <a v-show="showResult" href="{{detailUrl}}" style="float: right;" target="_blank">详细</a>
+        <a class="detail" v-show="showResult" href="{{detailUrl}}" style="float: right;" target="_blank">详细</a>
       </div>
       <div class="pronunciation" v-show="showResult && !hasChinese"> 
         <span>[ {{pronunciations.us}} ]</span>

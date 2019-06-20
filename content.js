@@ -21,6 +21,7 @@ document.addEventListener('mouseup', function (e) {
   const elemWhiteList = [
     'word_input',
     'v-transit_btn',
+    'detail',
   ]
   if (elemWhiteList.some(i => e.target.className.includes(i))) return
   const selection = window.getSelection().toString().trim()
